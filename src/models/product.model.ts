@@ -104,8 +104,3 @@ export function remove(id: number): boolean {
 export function findEvery(): Product[] {
   return (selectAllStmt.all() as ProductRow[]).map(toProduct);
 }
-
-/** Total number of products in the table. */
-export function count(): number {
-  return (countStmt.get() as { count: number }).count;
-}

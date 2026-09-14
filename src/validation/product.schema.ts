@@ -19,7 +19,7 @@ const productFields = {
     .string({ error: 'category is required and must be a string' })
     .trim()
     .min(1, 'category must be a non-empty string'),
-  size: z.string().trim().min(1).nullable().optional(),
+  size: z.string().trim().min(1, 'size must be a non-empty string').nullable().optional(),
   isAvailable: z.boolean().optional(),
   imageUrl: z.url('imageUrl must be a valid url').nullable().optional(),
 };

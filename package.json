@@ -1,0 +1,35 @@
+{
+  "name": "macky-merch-api",
+  "version": "1.0.0",
+  "description": "LSCS take home technical exam for Backend Engineering AVP application",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/galiciary/Macky-Merch-API.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/galiciary/Macky-Merch-API/issues"
+  },
+  "homepage": "https://github.com/galiciary/Macky-Merch-API#readme",
+  "dependencies": {
+    "better-sqlite3": "^13.0.3",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14",
+    "supertest": "^7.2.2",
+    "vitest": "^5.0.0"
+  },
+  "allowScripts": {
+    "better-sqlite3@13.0.3": true
+  }
+}

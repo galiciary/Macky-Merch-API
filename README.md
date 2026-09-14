@@ -336,4 +336,6 @@ ordering dependencies.
 - [x] **Bonus:** TypeScript
 - [x] **Bonus:** Pagination
 - [x] **Bonus:** Dockerfile (verified building and running)
-- [x] **Bonus:** Feature branches merged via pull requests (PRs #1–#3)
+- [ ] **Bonus:** Git workflow -> partially met. Feature branches and pull
+  requests were used for the final three changes (PRs #1–#3); the initial
+  scaffold and feature commits were pushed directly to `main`.

@@ -4,13 +4,21 @@ import { z } from 'zod';
  * Shared field definitions for create and update to stay in sync.
  */
 const productFields = {
-  name: z.string().trim().min(1, 'name must be a non-empty string'),
-  price: z.number().positive('price must be a positive number'),
+  name: z
+    .string({ error: 'name is required and must be a string' })
+    .trim()
+    .min(1, 'name must be a non-empty string'),
+  price: z
+    .number({ error: 'price is required and must be a number' })
+    .positive('price must be a positive number'),
   stock: z
-    .number()
+    .number({ error: 'stock is required and must be a number' })
     .int('stock must be an integer')
     .nonnegative('stock cannot be negative'),
-  category: z.string().trim().min(1, 'category must be a non-empty string'),
+  category: z
+    .string({ error: 'category is required and must be a string' })
+    .trim()
+    .min(1, 'category must be a non-empty string'),
   size: z.string().trim().min(1).nullable().optional(),
   isAvailable: z.boolean().optional(),
   imageUrl: z.url('imageUrl must be a valid url').nullable().optional(),

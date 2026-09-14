@@ -34,8 +34,8 @@ export const idParamSchema = z.object({
 
 /** ?page= & ?limit= query params for pagination. */
 export const paginationSchema = z.object({
-  page: z.coerce.number().int().positive().default(1),
-  limit: z.coerce.number().int().positive().max(100).default(10),
+  page: z.coerce.number().int().positive().optional(),
+  limit: z.coerce.number().int().positive().max(100).optional(),
 });
 
 export type CreateProductInput = z.infer<typeof createProductSchema>;

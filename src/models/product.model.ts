@@ -33,6 +33,7 @@ const insertStmt = db.prepare(`
   VALUES (@name, @price, @stock, @category, @size, @isAvailable, @imageUrl)
 `);
 const deleteStmt = db.prepare('DELETE FROM products WHERE id = ?');
+const selectAllStmt = db.prepare(`SELECT ${COLUMNS} FROM products ORDER BY id`);
 
 export function findAll(page: number, limit: number): PaginatedProducts {
   const offset = (page - 1) * limit;
@@ -76,8 +77,8 @@ export function update(id: number, input: UpdateProductInput): Product | null {
   const values: Record<string, string | number | null> = { id };
 
   // Column names come from the Zod strict schema, which rejects any key
-  // that is not a known column — so building the SET clause dynamically
-  // here cannot be used for SQL injection. Values stay parameterised.
+  // that is not a known column. So building the SET clause dynamically
+  // here cannot be used for SQL injection. The values stay parameterized.
   for (const [key, value] of Object.entries(input)) {
     assignments.push(`${key} = @${key}`);
     values[key] =
@@ -97,4 +98,14 @@ export function update(id: number, input: UpdateProductInput): Product | null {
 
 export function remove(id: number): boolean {
   return deleteStmt.run(id).changes > 0;
+}
+
+/** Returns every product, unpaginated. */
+export function findEvery(): Product[] {
+  return (selectAllStmt.all() as ProductRow[]).map(toProduct);
+}
+
+/** Total number of products in the table. */
+export function count(): number {
+  return (countStmt.get() as { count: number }).count;
 }

@@ -1,7 +1,7 @@
 {
   "name": "macky-merch-api",
   "version": "1.0.0",
-  "description": "LSCS take home technical exam for Backend Engineering AVP application",
+  "description": "RESTful inventory API for LSCS Macky Merch",
   "main": "dist/server.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",
@@ -9,14 +9,15 @@
     "start": "node dist/server.js",
     "test": "vitest run",
     "test:watch": "vitest",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "seed": "tsx src/scripts/seed.ts"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/galiciary/Macky-Merch-API.git"
   },
   "keywords": [],
-  "author": "",
+  "author": "Lance Galicia",
   "license": "ISC",
   "type": "commonjs",
   "bugs": {

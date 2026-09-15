@@ -1,24 +1,24 @@
 # Macky Merch API
 
-A RESTful inventory API for **Macky Merch**, the official merchandise of the
-La Salle Computer Society. Built for the 41st LSCS Backend Development
-Challenge (Systems and Infrastructure Committee).
+A RESTful inventory API for **Macky Merch**, the official merchandise of the La Salle Computer Society. Built for the 41st LSCS Backend Development Challenge under the Systems and Infrastructure Committee.
 
-Full CRUD over a merchandise catalog, with schema-based request validation,
-centralized error handling, pagination, and an automated test suite.
+The API supports full CRUD operations for a merchandise catalog, along with schema-based request validation, centralized error handling, pagination, and an automated test suite.
 
 ---
 
 ## Tech Stack
 
-| Concern | Choice | Reason |
-|---|---|---|
-| Runtime | Node.js 22+ | Required by the spec |
-| Framework | Express 5 | Required by the spec |
-| Language | TypeScript | Compile-time safety across every layer |
-| Database | SQLite via `better-sqlite3` | Real SQL engine, zero external setup |
-| Validation | Zod | Schemas double as the source of TypeScript types |
-| Testing | Vitest + Supertest | Native TypeScript support, no extra config |
+**Node.js 22+** for the runtime, as required by the specification.
+
+**Express 5** as the web framework, also required by the specification.
+
+**TypeScript** for compile-time type checking across the application. This helps catch mistakes before the code is run.
+
+**SQLite via `better-sqlite3`** for the database. It provides a real SQL database without requiring any external database server or setup.
+
+**Zod** for request validation. The same schemas are also used to generate the corresponding TypeScript types.
+
+**Vitest + Supertest** for testing. They work well with TypeScript and do not require much additional configuration.
 
 ---
 
@@ -37,8 +37,7 @@ cd Macky-Merch-API
 npm install
 ```
 
-> **Note:** `better-sqlite3` compiles native bindings during install. If npm
-> reports that install scripts were blocked, approve and rebuild:
+> **Note:** `better-sqlite3` needs to compile native bindings during installation. If npm reports that install scripts were blocked, approve the package and rebuild it:
 >
 > ```bash
 > npm install-scripts approve better-sqlite3
@@ -53,16 +52,16 @@ cp .env.example .env
 
 | Variable | Default | Description |
 |---|---|---|
-| `PORT` | `3000` | Port the HTTP server binds to |
+| `PORT` | `3000` | Port the HTTP server runs on |
 | `DB_PATH` | `./data/macky_merch.db` | Location of the SQLite database file |
 
 ### 3. Database setup
 
-No manual setup is required. On startup the application creates the `data/`
-directory if missing and executes `schema.sql`, which is idempotent
-(`CREATE TABLE IF NOT EXISTS`). The database file is created on first run.
+No manual database setup is required. When the application starts, it creates the `data/` directory if it does not exist and runs `schema.sql`. The schema is idempotent because it uses `CREATE TABLE IF NOT EXISTS`, so running the application again will not recreate an existing table.
 
-To load sample merchandise:
+The database file is created automatically on the first run.
+
+To load the sample merchandise:
 
 ```bash
 npm run seed
@@ -103,7 +102,7 @@ Base URL: `http://localhost:3000`
 
 | Method | Endpoint | Description | Success | Errors |
 |---|---|---|---|---|
-| `GET` | `/health` | Liveness check | `200` | — |
+| `GET` | `/health` | Check if the API is running | `200` | — |
 | `POST` | `/api/products` | Create a product | `201` | `400`, `500` |
 | `GET` | `/api/products` | List all products | `200` | `400`, `500` |
 | `GET` | `/api/products/:id` | Get one product | `200` | `400`, `404`, `500` |
@@ -119,14 +118,12 @@ Base URL: `http://localhost:3000`
 | `price` | number | required, positive | |
 | `stock` | integer | required, non-negative | |
 | `category` | string | required, non-empty | e.g. `"Clothing"` |
-| `size` | string or null | optional | **Custom** — apparel sizing |
-| `isAvailable` | boolean | defaults to `true` | **Custom** — hide items without deleting them |
-| `imageUrl` | string or null | optional, valid URL | **Custom** — product photo for storefronts |
-| `createdAt` | string | set by the database | **Custom** — audit trail, enables sorting by recency |
+| `size` | string or null | optional | **Custom**: apparel sizing |
+| `isAvailable` | boolean | defaults to `true` | **Custom**: hide items without deleting them |
+| `imageUrl` | string or null | optional, valid URL | **Custom**: product photo for storefronts |
+| `createdAt` | string | set by the database | **Custom**: keeps track of when a product was added |
 
-Four custom attributes were added beyond the five required. `isAvailable`
-exists because merchandise is often temporarily pulled from sale without being
-removed from inventory, which a hard delete cannot express.
+Four custom attributes were added beyond the five required fields. `isAvailable` is useful because merchandise may be temporarily unavailable without actually being removed from the inventory. A hard delete would not be able to represent that situation.
 
 ### Examples
 
@@ -152,7 +149,7 @@ curl -X POST localhost:3000/api/products \
 }
 ```
 
-Partial update — `PUT` accepts any subset of fields:
+Partial update: `PUT` accepts any subset of fields:
 
 ```bash
 curl -X PUT localhost:3000/api/products/1 \
@@ -166,24 +163,20 @@ curl -X PUT localhost:3000/api/products/1 \
 curl -i 'localhost:3000/api/products?page=1&limit=5'
 ```
 
-The response body is **always a top-level array**, as the specification
-requires. Pagination metadata travels in headers instead of wrapping the body,
-so the response shape never changes between paginated and unpaginated requests:
+The response body is **always a top-level array**, as required by the specification. Pagination information is returned through headers instead of wrapping the response body. This keeps the response format the same whether pagination is being used or not:
 
 | Header | Meaning |
 |---|---|
-| `X-Total-Count` | Total products in the database |
+| `X-Total-Count` | Total number of products in the database |
 | `X-Page` | Current page |
-| `X-Limit` | Items per page |
-| `X-Total-Pages` | Total pages available |
+| `X-Limit` | Number of items per page |
+| `X-Total-Pages` | Total number of available pages |
 
-Pagination activates only when `page` or `limit` is supplied. Without them the
-endpoint returns every product, so a default page size can never silently
-truncate results.
+Pagination only activates when `page` or `limit` is provided. Without either parameter, the endpoint returns every product. This prevents a default page size from silently leaving out results.
 
 ### Error format
 
-Every error, from any layer, returns the same shape:
+All errors use the same response structure regardless of which layer they come from:
 
 ```json
 {
@@ -196,17 +189,16 @@ Every error, from any layer, returns the same shape:
 }
 ```
 
-`details` appears only on validation failures, and lists **every** problem at
-once rather than stopping at the first.
+`details` is only included for validation errors. When validation fails, it lists **all** detected problems instead of stopping after the first one.
 
 ---
 
 ## Project Structure
 src/
-├── config/db.ts SQLite connection, pragmas, schema bootstrap
+├── config/db.ts SQLite connection, pragmas, and schema bootstrap
 ├── types/product.types.ts Row type, API type, and the mapper between them
 ├── validation/product.schema.ts Zod schemas and their inferred types
-├── models/product.model.ts Prepared SQL statements and data access
+├── models/product.model.ts Prepared SQL statements and database access
 ├── controllers/product.controller.ts HTTP handling only
 ├── routes/product.routes.ts Route declarations and their guards
 ├── middleware/
@@ -224,48 +216,33 @@ src/
 
 ### Why this folder structure
 
-The project is organized in layers, each with one responsibility, and
-dependencies only ever point downward: **routes → controllers → models → database**.
+The project is split into layers, with each layer handling one main responsibility. Dependencies only move downward: **routes → controllers → models → database**.
 
-Routes declare what is exposed and what guards it. Controllers translate
-between HTTP and the domain, and contain no SQL. Models own every query and
-know nothing about HTTP. No `req`, no `res`, no status codes. That boundary is
-what makes the model layer independently testable and what would let the
-storage engine be swapped without touching a single controller.
+Routes define what the API exposes and which guards are applied. Controllers handle HTTP-related work and do not contain SQL. Models handle all database queries and do not know anything about HTTP. They do not use `req`, `res`, or status codes.
 
-Validation and types live in their own directories because both are shared
-across layers rather than belonging to any one of them.
+Keeping that boundary makes the model layer easier to test on its own. It also means the database layer could be replaced later without having to change the controllers.
+
+Validation and types have their own directories because they are shared across multiple layers instead of belonging to just one part of the application.
 
 ### Why SQLite
 
-SQLite is a real SQL database with real constraints, transactions, and a query
-planner. The `CHECK` constraints on `price` and `stock` are enforced by the
-engine itself, independently of application code. Unlike PostgreSQL or MongoDB
-it requires no running server, no credentials, and no connection string, so
-`npm install && npm test` works on a fresh clone with nothing else installed.
+SQLite is a real SQL database with support for constraints, transactions, and query planning. The `CHECK` constraints on `price` and `stock` are enforced by the database itself, so invalid values cannot rely solely on application-level checks.
 
-For an inventory API of this scale, a client/server database would add
-operational overhead without adding capability. `better-sqlite3` was chosen for
-its stable, synchronous API, and raw parameterized SQL was preferred over an ORM
-so the data layer stays explicit and reviewable.
+Compared with PostgreSQL or MongoDB, SQLite does not require a separate running server, credentials, or connection string. This means a fresh clone can run with `npm install && npm test` without setting up another service.
+
+For an inventory API of this size, using a client/server database would add setup and maintenance overhead without providing much additional value. `better-sqlite3` was chosen for its straightforward synchronous API. Raw parameterized SQL was also preferred over an ORM so that the database queries remain easy to see and review.
 
 ### Why Zod defines the types
 
-Request schemas are written once in Zod, and the TypeScript types are derived
-from them with `z.infer`. Validation rules and static types therefore cannot
-drift apart — changing a schema changes the type, and any code that no longer
-matches fails to compile.
+Request schemas are defined once in Zod, and the corresponding TypeScript types are generated using `z.infer`. This keeps the validation rules and TypeScript types connected. When a schema changes, the resulting type changes with it, and code that no longer matches will fail to compile.
 
-The schemas use `z.strictObject`, which rejects unknown fields rather than
-silently discarding them. A client that misspells `stock` as `stocks` receives
-a `400` explaining the problem instead of a `201` with a field quietly ignored.
+The schemas use `z.strictObject`, which rejects unknown fields instead of silently ignoring them. For example, if a client sends `stocks` instead of `stock`, the API returns a `400` explaining the issue instead of returning a `201` while quietly ignoring the incorrect field.
 
 ### Why `app.ts` and `server.ts` are separate
 
-`app.ts` builds and exports the Express application but never calls `listen`.
-`server.ts` is the only module that binds a port. This lets Supertest import
-the app and issue requests against it in process — no real port, no race
-conditions on startup, and no lingering server after the suite finishes.
+`app.ts` creates and exports the Express application but does not call `listen`. `server.ts` is the only module responsible for starting the server and binding the port.
+
+This lets Supertest import the app and send requests to it directly during testing. There is no need for a real port, there are no startup race conditions, and the test suite does not have to clean up a running server afterward.
 
 ---
 
@@ -273,37 +250,27 @@ conditions on startup, and no lingering server after the suite finishes.
 
 **Express 5 made `req.query` a read-only getter.**
 
-The validation middleware was written to parse a request segment with Zod and
-assign the result back, so downstream handlers would receive coerced values
-rather than raw strings:
+The validation middleware originally parsed a request segment with Zod and assigned the validated result back to it. The goal was to make sure downstream handlers received the validated and converted values instead of the original strings:
 
 ```ts
 req.query = result.data;  // works in Express 4
 ```
 
-Under Express 4 this is fine. Under Express 5 the `GET /api/products` route
-failed at runtime with a `TypeError` about assigning to a property that has
-only a getter. What made the cause non-obvious was that the same middleware
-worked perfectly when validating `req.body`. It looked like a Zod problem
-rather than an Express one.
+This worked in Express 4, but the `GET /api/products` route started failing under Express 5 with a `TypeError` when trying to assign to a property that only has a getter.
 
-The cause is a deliberate Express 5 change: `req.query` is now defined as a
-lazily-evaluated getter with no setter, so the query string is parsed only when
-first accessed. Assigning to it is no longer possible.
+The confusing part was that the same middleware worked correctly when validating `req.body`. At first, the problem looked like it might be related to Zod rather than Express.
 
-The fix was to stop mutating the request. The middleware now writes the
-validated result to `res.locals`, which exists precisely for per-request data
-passed between middleware:
+The actual cause was a change in Express 5. `req.query` is now exposed as a lazily evaluated getter with no setter, so assigning a new value to it is no longer supported.
+
+The fix was to stop modifying the request object. Instead, the middleware now stores the validated result in `res.locals`, which is intended for passing per-request data between middleware:
 
 ```ts
 res.locals[source] = result.data;
 ```
 
-Controllers read from `res.locals` instead of the raw request. This turned out
-to be better than the original approach rather than merely a workaround: the
-request object stays immutable, and the distinction between *raw input* and
-*validated input* becomes explicit at every call site. A controller reading
-`res.locals.query` is unambiguously reading data that passed validation.
+Controllers then read the validated values from `res.locals` instead of the original request.
+
+This ended up being better than the original approach rather than just being a workaround. The request object remains unchanged, and the difference between **raw input** and **validated input** is clear at each call site. When a controller reads `res.locals.query`, it is explicitly working with data that has already passed validation.
 
 ---
 
@@ -311,16 +278,11 @@ request object stays immutable, and the distinction between *raw input* and
 
 19 tests across six suites, run with `npm test`.
 
-Coverage includes all five CRUD endpoints, the full validation surface
-(missing fields, negative price, unknown fields, empty update bodies,
-non-numeric IDs), `404` handling for every ID-addressed route, pagination
-including header metadata, unknown-route handling, and malformed JSON.
+The tests cover all five CRUD endpoints, the full validation surface including missing fields, negative prices, unknown fields, empty update bodies, and non-numeric IDs. They also cover `404` responses for ID-based routes, pagination and its header metadata, unknown routes, and malformed JSON.
 
-Two details worth noting. Tests run against an **in-memory** SQLite database,
-configured in `vitest.config.mts` — the suite truncates the products table
-before each test, and pointing it at the development database would destroy
-real data. And because each test starts from an empty table, the suite has no
-ordering dependencies.
+Two details are worth noting. Tests use an **in-memory** SQLite database configured in `vitest.config.mts`. The products table is cleared before each test, which keeps tests isolated. Using the development database instead could accidentally destroy real data.
+
+Because every test starts with an empty table, the tests also do not depend on a particular execution order.
 
 ---
 
@@ -336,6 +298,4 @@ ordering dependencies.
 - [x] **Bonus:** TypeScript
 - [x] **Bonus:** Pagination
 - [x] **Bonus:** Dockerfile (verified building and running)
-- [ ] **Bonus:** Git workflow -> partially met. Feature branches and pull
-  requests were used for the final three changes (PRs #1–#3); the initial
-  scaffold and feature commits were pushed directly to `main`.
+- [ ] **Bonus:** Git workflow -> partially met. Feature branches and pull requests were used for the final three changes (PRs #1–#3); the initial scaffold and feature commits were pushed directly to `main`.

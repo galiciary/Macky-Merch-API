@@ -194,21 +194,23 @@ All errors use the same response structure regardless of which layer they come f
 ---
 
 ## Project Structure
-src/
-├── config/db.ts SQLite connection, pragmas, and schema bootstrap
-├── types/product.types.ts Row type, API type, and the mapper between them
-├── validation/product.schema.ts Zod schemas and their inferred types
-├── models/product.model.ts Prepared SQL statements and database access
-├── controllers/product.controller.ts HTTP handling only
-├── routes/product.routes.ts Route declarations and their guards
-├── middleware/
-│ ├── validate.middleware.ts Reusable Zod validator
-│ └── error.middleware.ts 404 handler and centralized error handler
-├── utils/ApiError.ts Error class carrying an HTTP status code
-├── scripts/seed.ts Sample data loader
-├── app.ts Express app composition
-└── server.ts Port binding
 
+```
+src/
+├── config/db.ts                       SQLite connection, pragmas, and schema bootstrap
+├── types/product.types.ts             Row type, API type, and the mapper between them
+├── validation/product.schema.ts       Zod schemas and their inferred types
+├── models/product.model.ts            Prepared SQL statements and database access
+├── controllers/product.controller.ts  HTTP handling only
+├── routes/product.routes.ts           Route declarations and their guards
+├── middleware/
+│   ├── validate.middleware.ts         Reusable Zod validator
+│   └── error.middleware.ts            404 handler and centralized error handler
+├── utils/ApiError.ts                  Error class carrying an HTTP status code
+├── scripts/seed.ts                    Sample data loader
+├── app.ts                             Express app composition
+└── server.ts                          Port binding
+```
 
 ---
 

@@ -1,6 +1,6 @@
 # Macky Merch API
 
-A RESTful inventory API for **Macky Merch**, the official merchandise of the La Salle Computer Society. Built for the 41st LSCS Backend Development Challenge under the Systems and Infrastructure Committee.
+A RESTful inventory API for **Macky Merch**, the official merchandise of the La Salle Computer Society.
 
 The API supports full CRUD operations for a merchandise catalog, along with schema-based request validation, centralized error handling, pagination, and an automated test suite.
 
